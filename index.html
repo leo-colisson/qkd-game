@@ -1,0 +1,205 @@
+<html>
+  <head>
+    <title>Jeux QKD</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- UIkit CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.13.7/dist/css/uikit.min.css" />
+
+    <!-- UIkit JS -->
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.13.7/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.13.7/dist/js/uikit-icons.min.js"></script>
+
+
+    <script src="https://unpkg.com/vue@3"></script>
+    <style>
+      html {
+          background: black;
+          padding : 0px ;
+          margin : 0px ;
+          width : 100hv ;
+          height : 100hv;
+          /* color: white; */
+      }
+      .centralImage {
+          width: 100%;
+          max-width: 550px;
+      }
+      /* Pour les images superposées quand on triche  */
+      .cheating-container {
+          position: relative;
+          display: inline-block;
+          padding: 0px;
+          margin: 0px;
+      }
+
+      .cheating-img {
+          position: absolute;
+          top: 0;
+          left: 0;
+          opacity: .5;
+      }
+
+      .game-container {
+          text-align: center;
+      }
+
+      .envoyer {
+          background-color: green;
+      }
+    </style>
+  </head>
+  <body class="uk-light">
+    <div id="app" class="uk-section uk-container">
+      <h1>Jeux de distribution quantique de clés (QKD)</h1>
+      <p>Bienvenue dans ce mini-jeux ayant pour vocation d'illustrer la distribution quantique de clé (QKD). Générez des qubits sur votre téléphone, envoyer le à un⋅e ami⋅e et retrouvez ensemble une clé secrète ! Mais attention de ne pas vous faire avoir par un adversaire un peu trop curieux…</p>
+
+      <div class="game-container">
+        <div v-if="step=='preparation'">
+          <h2>Étape 1: Alice prépare l'état</h2>
+          <p>
+            <img :src="images[internal_state]"
+                 :alt="strFromState"
+                 class="centralImage" />
+          </p>
+          <p >
+            Etat:
+            <button class="uk-button uk-button-default" @click="toggleHV">{{internalHorV}}</button> <button class="uk-button uk-button-default" @click="toggle01">{{internal0or1}}</button> <button class="uk-button uk-button-danger" @click="envoyer">Envoyer !</button>
+          </p>
+        </div>
+
+        <div v-if="step=='sending'">
+          <h2>Étape 2: Envoie du qubit en cours…</h2>
+          <p>
+            <img :src="images.sending"
+                 alt="Envoie en cours"
+                 class="centralImage" />
+          </p>
+          <p>
+            Donnez votre téléphone/ordinateur à Bob… ou à l'adversaire. <button class="uk-button uk-button-danger" @click="bienRecu"> Bien reçu !</button>
+          </p>
+        </div>
+
+        <div v-if="step=='choose_measurement'">
+          <h2>Étape 3: Bob (ou l'adversaire) mesure</h2>
+          <p class="cheating-container">
+            <img :src="images['measure'+measurement_basis]"
+                 :alt="'Mesure base ' + measurementHorV"
+                 class="centralImage" />
+            <img v-if="cheating"
+                 :src="images[internal_state]"
+                 :alt="'Mesure base ' + measurementHorV"
+                 class="centralImage cheating-img" />
+          </p>
+          <p>
+            Choix de la base: <button class="uk-button uk-button-default" style="min-width: 22ex;" @click="toggleMeasurement">{{measurementHorV}}</button> <button class="uk-button uk-button-danger" @click="mesurer">Mesurer !</button> Tricher: <button class="uk-button uk-button-default" @click="toggleCheating">{{cheating?'Oui':'Non'}}</button><br/>
+          </p>
+        </div>
+
+        <div v-if="step=='outcome'">
+          <h2>Étape 3: La mesure donne…</h2>
+          <p>
+            <img :src="images['outcome'+measurement_outcome]"
+                 :alt="'Résultat mesure: '+measurement_outcome"
+                 class="centralImage" />
+          </p>
+          <p>
+            À vous de bien utiliser ce résultat pour obtenir une clé secrète ;-) Si vous êtes un adversaire, continuez en vous faisant passer pour Alice auprès de Bob!
+            <button class="uk-button uk-button-danger" @click="restart">Continuer !</button>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      Vue.createApp({
+        data() {
+          return {
+            // step must be in preparation/sending/choose_measurement/outcome
+            step: 'preparation',
+            // 0 = |0>, 1 = |1>, 2 = |+>, 3 = |->
+            internal_state: 0,
+            measurement_basis: 0,
+            measurement_outcome: 0,
+            cheating: false,
+            images: {
+              // States: 0/1/2/3 = |0>/|1>/|+>/|->
+              0: "images/0000.jpg",
+              1: "images/0001.jpg",
+              2: "images/0002.jpg",
+              3: "images/0003.jpg",
+              "sending": "images/0005.jpg",
+              // Basis V
+              "measure0": "images/0006.jpg",
+              // Basis H
+              "measure1": "images/0007.jpg",
+              "outcome0": "images/0008.jpg",
+              "outcome1": "images/0009.jpg"
+            },
+          }
+        },
+        computed: {
+          strFromState: function () {
+            switch (this.internal_state) {
+              case 0:
+                return "|0>";
+              case 1:
+                return "|1>";
+              case 2:
+                return "|+>";
+              case 3:
+                return "|->";
+            }
+          },
+          internalHorV: function () {
+            return (this.internal_state < 2) ? "Vertical" : "Horizontal"
+          },
+          internal0or1: function () {
+            return this.internal_state % 2
+          },
+          measurementHorV: function () {
+            return (this.measurement_basis == 0) ? "Vertical" : "Horizontal"
+          },
+        },
+        methods: {
+          toggleHV: function (event) {
+            this.internal_state = (this.internal_state + 2) % 4
+          },
+          toggle01: function (event) {
+            this.internal_state = (this.internal_state % 2 == 0) ? this.internal_state + 1 : this.internal_state - 1
+          },
+          envoyer: function (event) {
+            this.step = "sending"
+          },
+          bienRecu: function (event) {
+            this.step = "choose_measurement"
+          },
+          toggleMeasurement: function (event) {
+            this.measurement_basis = (this.measurement_basis + 1) % 2
+          },
+          toggleCheating: function (event) {
+            this.cheating = !this.cheating
+          },
+          mesurer: function (event) {
+            // Check if the basis is good
+            if ((this.internal_state < 2 && this.measurement_basis == 0)
+                || (this.internal_state >= 2 && this.measurement_basis == 1))
+            {
+              this.measurement_outcome = this.internal_state % 2
+            }
+            else { // We measure in the wrong basis: random outcome
+              this.measurement_outcome = (Math.random()>=0.5)? 1 : 0
+            }
+            this.step = "outcome"
+          },
+          restart: function (event) {
+            this.step = "preparation";
+            this.internal_state = 0;
+            this.measurement_basis = 0;
+            this.measurement_outcome = 0;
+          }
+        }
+      }).mount('#app')
+    </script>
+  </body>
+</html>
