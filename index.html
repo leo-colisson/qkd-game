@@ -53,11 +53,17 @@
     <div id="app" class="uk-section uk-container">
       <h1>Jeux de distribution quantique de clés (QKD)</h1>
       <p>Bienvenue dans ce mini-jeux ayant pour vocation d'illustrer la distribution quantique de clé (QKD). Générez des qubits sur votre téléphone, envoyer le à un⋅e ami⋅e et retrouvez ensemble une clé secrète ! Mais attention de ne pas vous faire avoir par un adversaire un peu trop curieux…</p>
+      <p>Nombre d'instances: {{nb_copies}} <button class="uk-button uk-button-default uk-button-small" @click="nb_copies=Math.max(1,nb_copies-1)">-</button> <button class="uk-button uk-button-default uk-button-small" @click="nb_copies++">+</button></p>
+      <div v-for="index in nb_copies">
+        <game :instance="index"></game>
+      </div>
+    </div>
 
+    <script type="text/x-template" id="template-game">
       <div class="game-container">
         <!-- Preload images, or it will give ugly "shaking/scrolling" effects when moving in the page -->
         <div v-if="step=='preparation'">
-          <h2>Étape 1: Alice prépare l'état</h2>
+          <h2><span class="uk-badge" v-if="instance>0">{{instance}}</span> Étape 1: Alice prépare l'état</h2>
           <p>
             <img :src="images[internal_state]"
                  :alt="strFromState"
@@ -70,7 +76,7 @@
         </div>
 
         <div v-if="step=='sending'">
-          <h2>Étape 2: Envoie du qubit en cours…</h2>
+          <h2><span class="uk-badge" v-if="instance>0">{{instance}}</span> Étape 2: Envoie du qubit en cours…</h2>
           <p>
             <img :src="images.sending"
                  alt="Envoie en cours"
@@ -82,7 +88,7 @@
         </div>
 
         <div v-if="step=='choose_measurement'">
-          <h2>Étape 3: Bob (ou l'adversaire) mesure</h2>
+          <h2><span class="uk-badge" v-if="instance>0">{{instance}}</span> Étape 3: Bob (ou l'adversaire) mesure</h2>
           <p class="cheating-container">
             <img :src="images['measure'+measurement_basis]"
                  :alt="'Mesure base ' + measurementHorV"
@@ -98,7 +104,7 @@
         </div>
 
         <div v-if="step=='outcome'">
-          <h2>Étape 3: La mesure donne…</h2>
+          <h2><span class="uk-badge" v-if="instance>0">{{instance}}</span> Étape 3: La mesure donne…</h2>
           <p>
             <img :src="images['outcome'+measurement_outcome]"
                  :alt="'Résultat mesure: '+measurement_outcome"
@@ -113,10 +119,18 @@
           <link rel="preload" :href="image" as="image">
         </div>
       </div>
-    </div>
+    </script>
 
     <script>
-      Vue.createApp({
+      const GameComponent = {
+        template: '#template-game',
+        props: {
+          // If non zero, describe the instance number
+          instance: {
+            type: Number,
+            default: 0
+          },
+        },
         data() {
           return {
             // step must be in preparation/sending/choose_measurement/outcome
@@ -203,7 +217,15 @@
             this.measurement_outcome = 0;
           }
         }
-      }).mount('#app')
+      }
+      
+      Vue.createApp({
+        data() {
+          return {
+            nb_copies: 1,
+          };
+        }
+      }).component("game", GameComponent).mount('#app')
     </script>
   </body>
 </html>
