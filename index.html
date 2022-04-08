@@ -55,6 +55,7 @@
       <p>Bienvenue dans ce mini-jeux ayant pour vocation d'illustrer la distribution quantique de clé (QKD). Générez des qubits sur votre téléphone, envoyer le à un⋅e ami⋅e et retrouvez ensemble une clé secrète ! Mais attention de ne pas vous faire avoir par un adversaire un peu trop curieux…</p>
 
       <div class="game-container">
+        <!-- Preload images, or it will give ugly "shaking/scrolling" effects when moving in the page -->
         <div v-if="step=='preparation'">
           <h2>Étape 1: Alice prépare l'état</h2>
           <p>
@@ -107,6 +108,9 @@
             À vous de bien utiliser ce résultat pour obtenir une clé secrète ;-) Si vous êtes un adversaire, continuez en vous faisant passer pour Alice auprès de Bob!
             <button class="uk-button uk-button-danger" @click="restart">Continuer !</button>
           </p>
+        </div>
+        <div v-for="image in images">
+          <link rel="preload" :href="image" as="image">
         </div>
       </div>
     </div>
