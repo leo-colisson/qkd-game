@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>Jeux QKD</title>
+    <title>Jeu QKD</title>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- UIkit CSS -->
@@ -51,8 +51,8 @@
   </head>
   <body class="uk-light">
     <div id="app" class="uk-section uk-container">
-      <h1>Jeux de distribution quantique de clés (QKD)</h1>
-      <p>Bienvenue dans ce mini-jeux ayant pour vocation d'illustrer la distribution quantique de clé (QKD). Générez des qubits sur votre téléphone, envoyer le à un⋅e ami⋅e et retrouvez ensemble une clé secrète ! Mais attention de ne pas vous faire avoir par un adversaire un peu trop curieux…</p>
+      <h1>Jeu de distribution quantique de clés (QKD)</h1>
+      <p>Bienvenue dans ce mini-jeu ayant pour vocation d'illustrer la distribution quantique de clé (QKD). Générez des qubits sur votre téléphone, envoyez-le à un⋅e ami⋅e et retrouvez ensemble une clé secrète ! Mais attention de ne pas vous faire avoir par un adversaire un peu trop curieux…</p>
       <p>Nombre d'instances: {{nb_copies}} <button class="uk-button uk-button-default uk-button-small" @click="nb_copies=Math.max(1,nb_copies-1)">-</button> <button class="uk-button uk-button-default uk-button-small" @click="nb_copies++">+</button></p>
       <div v-for="index in nb_copies">
         <game :instance="index"></game>
